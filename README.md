@@ -32,6 +32,8 @@ NotificationTimeout=30
 
 ## Setup & Usage
 
+Either download the compiled x64 version from releases or follow below steps. Keep ".exe" (app) and ".ini" (config file) in the same folder. 
+
 1. Compile the application in Visual Studio (with the "Desktop development with C++" workload) or using the MSVC command line.
 2. Place `BatteryNotifier.exe` and `BatteryNotifier.ini` in the same folder.
 3. Run the `.exe`. A tray icon will appear (hover text: "Battery Monitor").
