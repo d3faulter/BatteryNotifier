@@ -30,3 +30,20 @@
 *.exe
 *.out
 *.app
+
+# Visual Studio
+.vs/
+*.vc.db
+*.vc.opendb
+*.user
+*.VC.db
+*.VC.VC.opendb
+*.suo
+*.exe.recipe
+*.pdb
+*.obj
+*.log
+Debug/
+Release/
+x64/
+x86/
