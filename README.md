@@ -2,6 +2,8 @@
 
 A super-lightweight Windows tray application that notifies you when your laptop battery reaches user-defined thresholds for connecting or disconnecting the charger to prolong battery life. Uses **under 1 MB of RAM** in most cases!
 
+It may not be the prettiest, but it's most likely the lightest charging notification app out there.
+
 ![image](https://github.com/user-attachments/assets/ba511a98-06e0-4d29-bdad-51c21d8e5a04)
 
 ## Features
@@ -10,7 +12,8 @@ A super-lightweight Windows tray application that notifies you when your laptop 
 - **Simple config**: Set thresholds in an `.ini` file. The app reloads it on-the-fly every 30 seconds.
 - **Balloon notifications**: Displays balloon tips (legacy Windows style) by default, which may appear in Action Center on Windows 10/11.
 
-![image](https://github.com/user-attachments/assets/e29d0eb5-81fa-4a5f-bd46-b0780b5901ac)
+![image](https://github.com/user-attachments/assets/a509f4e8-bf50-4aad-b171-8dc526d52762)
+
 
 ## Configuration
 
