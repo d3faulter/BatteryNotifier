@@ -1,8 +1,6 @@
 # BatteryNotifier
 
-A super-lightweight Windows tray application that notifies you when your laptop battery reaches user-defined thresholds for connecting or disconnecting the charger to prolong battery life. Uses **under 1 MB of RAM** in most cases!
-
-It may not be the prettiest, but it's most likely the lightest charging notification app out there.
+The most lightweight Windows tray application for charging notifications. It notifies you when your laptop battery reaches user-defined thresholds for connecting or disconnecting the charger to prolong battery life. Uses **under 1 MB of RAM** in most cases!
 
 ![image](https://github.com/user-attachments/assets/ba511a98-06e0-4d29-bdad-51c21d8e5a04)
 
