@@ -43,19 +43,4 @@ Either download the compiled x64 version from releases or follow below steps. Ke
 
 - Windows 10/11 might show balloon tips briefly or in the Action Center, ignoring long timeouts.
 - Notifications may not always appear in the Notification Center or Action Center due to how Windows handles legacy balloon notifications.
-- For truly persistent notifications requiring user dismissal, you would need modern Windows Toast APIs (heavier implementation).
-
-
-
-## Screenshot
-
-- If you have a screenshot showing ~0.9 MB in Task Manager, place it in a folder (e.g., `docs/images/`) in your repository and reference it in the README as shown above.
-
----
-
-## Summary
-
-- **Include** your `.cpp`, optional sample `.ini`, and this `README.md` in your repository.
-- **Push** your project to a repository with `git init`, `git commit`, `git remote add origin`, and `git push`.
-- Optionally **create a release** on GitHub with a tagged version and (optionally) an `.exe` for easy download.
-
+- For truly persistent notifications requiring user dismissal, you would need modern Windows Toast notifications (more resource heavy).
