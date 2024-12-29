@@ -4,8 +4,6 @@ A super-lightweight Windows tray application that notifies you when your laptop 
 
 ![image](https://github.com/user-attachments/assets/ba511a98-06e0-4d29-bdad-51c21d8e5a04)
 
-<sup>Above: Only ~0.9 MB usage in Task Manager!</sup>
-
 ## Features
 
 - **Tiny footprint**: Written in C++ with raw Win32 APIs, typically under **1 MB** memory use.
