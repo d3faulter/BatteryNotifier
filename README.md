@@ -3,6 +3,7 @@
 A super-lightweight Windows tray application that notifies you when your laptop battery reaches a user-defined "unplug" threshold or a "plug in" threshold. Uses **under 1 MB of RAM** in most cases!
 
 ![image](https://github.com/user-attachments/assets/ba511a98-06e0-4d29-bdad-51c21d8e5a04)
+
 <sup>Above: Only ~0.9 MB usage in Task Manager!</sup>
 
 ## Features
