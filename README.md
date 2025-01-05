@@ -17,7 +17,7 @@ The most lightweight Windows tray application for charging notifications. It not
 ## Configuration
 
 Create or edit a `.ini` file named `BatteryNotifier.ini` in the same folder as the `.exe`. Example:  
-**Note:** Please restart application after making changes.  
+
 
 
 ```ini
@@ -29,6 +29,7 @@ NotificationTimeout=30
 NotificationIntervalType=time
 NotificationIntervalValue=5
 ```
+**Note:** Please restart application after making changes.  
 
 ### Explanation:
 - **UnplugThreshold**: If battery >= this value and you’re on AC, you’ll see an "unplug" balloon.
