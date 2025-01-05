@@ -1,18 +1,29 @@
-// BatteryTrayApp.cpp
 #include <windows.h>
 #include <shellapi.h>
 #include <tchar.h>
 #include <string>
 #include <shobjidl.h>  // For SetCurrentProcessExplicitAppUserModelID
+#include <sstream>
 
+// ---------------------------------------------------------------------------
 // Global config
-static int  g_unplugThreshold = 80;   // Unplug threshold
-static int  g_plugThreshold = 35;   // Plug threshold
-static bool g_noRecurringBelow = false;   // Whether we skip repeated "below threshold" notifications
+static int  g_unplugThreshold = 80;   // Disconnect threshold
+static int  g_plugThreshold = 35;   // Connect threshold
+static bool g_noRecurringBelow = false; // Skip repeated "connect" notifications
+static bool g_noRecurringAbove = false; // Skip repeated "disconnect" notifications
 static int  g_notificationSecs = 30;   // Timeout for notifications, in seconds
 
-// Keep track if we've already shown "below threshold"
-static bool g_belowShown = false;
+// Notification interval config
+static std::wstring g_intervalType = L"time";  // "time" or "percentage"
+static int          g_intervalValue = 5;       // number of minutes or % points
+
+// State tracking
+static bool  g_belowShown = false; // have we shown "connect" recently?
+static bool  g_aboveShown = false; // have we shown "disconnect" recently?
+
+// For limiting notification intervals
+static DWORD g_lastNotifyTime = 0; // GetTickCount() of last notification
+static int   g_lastNotifyBattery = -1;
 
 // Unique identifiers
 #define WM_TRAYICON       (WM_USER + 1)
@@ -29,6 +40,7 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 void LoadConfig();
 void CheckBattery();
 void ShowBalloonTip(const wchar_t* title, const wchar_t* msg, UINT timeoutMs);
+bool CanShowNotification(int currentBattery);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -38,7 +50,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     g_hInstance = hInstance;
 
     // Set an explicit AppUserModelID so Windows sees us as a distinct "app"
-    SetCurrentProcessExplicitAppUserModelID(L"BatteryTrayApp.Lite.1.0");
+    SetCurrentProcessExplicitAppUserModelID(L"BatteryNotifier.Lite.1.0");
 
     // Load thresholds and other configs
     LoadConfig();
@@ -47,13 +59,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     WNDCLASS wc = { 0 };
     wc.lpfnWndProc = WndProc;
     wc.hInstance = hInstance;
-    wc.lpszClassName = L"BatteryTrayAppClass";
+    wc.lpszClassName = L"BatteryNotifierClass";
     wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     RegisterClass(&wc);
 
     // Create hidden window
-    g_hWnd = CreateWindow(L"BatteryTrayAppClass",
-        L"Battery Tray App",
+    g_hWnd = CreateWindow(
+        L"BatteryNotifierClass",
+        L"BatteryNotifier",
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT,
         200, 200,
@@ -67,7 +80,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     g_nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP | NIF_SHOWTIP;
     g_nid.uCallbackMessage = WM_TRAYICON;
     g_nid.hIcon = LoadIcon(NULL, IDI_INFORMATION);
-    wcscpy_s(g_nid.szTip, L"Battery Monitor");
+    wcscpy_s(g_nid.szTip, L"BatteryNotifier");
 
     // Add icon to tray
     Shell_NotifyIcon(NIM_ADD, &g_nid);
@@ -76,14 +89,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     g_nid.uVersion = NOTIFYICON_VERSION_4;
     Shell_NotifyIcon(NIM_SETVERSION, &g_nid);
 
-    // Show initial balloon
-    ShowBalloonTip(
-        L"Battery Monitor",
-        L"Battery Monitor is running.\nWe'll notify you about connecting/disconnecting the charger.",
-        g_notificationSecs * 1000
-    );
+    // Show initial balloon with user thresholds
+    {
+        std::wstringstream ss;
+        ss << L"BatteryNotifier running.\n"
+            << L"Connect at " << g_plugThreshold << L"%.\n"
+            << L"Disconnect at " << g_unplugThreshold << L"%.";
+        ShowBalloonTip(
+            L"BatteryNotifier",
+            ss.str().c_str(),
+            g_notificationSecs * 1000
+        );
+    }
 
-    // Timer for battery checks every 30 seconds
+    // Set a timer to check battery every 30 seconds (you can adjust this)
     SetTimer(g_hWnd, IDT_BATTERYCHECK, 30000, NULL);
 
     // Message loop
@@ -159,18 +178,82 @@ void LoadConfig()
     g_unplugThreshold = GetPrivateProfileInt(L"Settings", L"UnplugThreshold", 80, iniPath);
     g_plugThreshold = GetPrivateProfileInt(L"Settings", L"PlugThreshold", 35, iniPath);
 
-    // Read "NoRecurringBelow" as "true" or "false"
-    wchar_t buf[16] = { 0 };
-    GetPrivateProfileString(L"Settings", L"NoRecurringBelow", L"false", buf, 16, iniPath);
-    _wcslwr_s(buf);
-    g_noRecurringBelow = (wcscmp(buf, L"true") == 0);
+    // Read "NoRecurringBelow"
+    {
+        wchar_t buf[16] = { 0 };
+        GetPrivateProfileString(L"Settings", L"NoRecurringBelow", L"false", buf, 16, iniPath);
+        _wcslwr_s(buf);
+        g_noRecurringBelow = (wcscmp(buf, L"true") == 0);
+    }
+
+    // Read "NoRecurringAbove"
+    {
+        wchar_t buf[16] = { 0 };
+        GetPrivateProfileString(L"Settings", L"NoRecurringAbove", L"false", buf, 16, iniPath);
+        _wcslwr_s(buf);
+        g_noRecurringAbove = (wcscmp(buf, L"true") == 0);
+    }
 
     // Read NotificationTimeout (in seconds)
-    int defaultTimeout = 30;
-    int readValue = GetPrivateProfileInt(L"Settings", L"NotificationTimeout", defaultTimeout, iniPath);
-    // If user sets negative or zero, let's clamp it to at least 5 seconds
-    if (readValue < 5) readValue = 5;
-    g_notificationSecs = readValue;
+    {
+        int defaultTimeout = 30;
+        int readValue = GetPrivateProfileInt(L"Settings", L"NotificationTimeout", defaultTimeout, iniPath);
+        if (readValue < 5) readValue = 5;
+        g_notificationSecs = readValue;
+    }
+
+    // Read NotificationIntervalType ("time" or "percentage")
+    {
+        wchar_t buf[32] = { 0 };
+        GetPrivateProfileString(L"Settings", L"NotificationIntervalType", L"time", buf, 32, iniPath);
+        // Convert to lowercase
+        _wcslwr_s(buf);
+        g_intervalType = buf;
+        if (g_intervalType != L"time" && g_intervalType != L"percentage")
+        {
+            // default to time if invalid
+            g_intervalType = L"time";
+        }
+    }
+
+    // Read NotificationIntervalValue
+    {
+        int val = GetPrivateProfileInt(L"Settings", L"NotificationIntervalValue", 5, iniPath);
+        if (val < 1) val = 1; // clamp at 1
+        g_intervalValue = val;
+    }
+}
+
+// Decide whether we can show a new notification based on time or percentage
+bool CanShowNotification(int currentBattery)
+{
+    DWORD now = GetTickCount();
+
+    if (g_intervalType == L"time")
+    {
+        // Check how many ms have passed since last notification
+        DWORD elapsedMs = now - g_lastNotifyTime;
+        // Convert user-specified minutes to milliseconds
+        DWORD neededMs = (DWORD)g_intervalValue * 60 * 1000;
+        if (elapsedMs < neededMs)
+            return false;
+    }
+    else
+    {
+        // "percentage" mode
+        // Check the difference in battery level from last notification
+        if (g_lastNotifyBattery >= 0)
+        {
+            int diff = abs(currentBattery - g_lastNotifyBattery);
+            if (diff < g_intervalValue)
+                return false;
+        }
+    }
+
+    // If we get here, it's okay to show
+    g_lastNotifyTime = now;
+    g_lastNotifyBattery = currentBattery;
+    return true;
 }
 
 // Check battery
@@ -185,35 +268,64 @@ void CheckBattery()
         int  percent = sps.BatteryLifePercent;
         bool onAC = (sps.ACLineStatus == 1);
 
+        // If enough time/percentage hasn't passed, skip checking notifications entirely
+        // so we don't spam the user.
+        if (!CanShowNotification(percent)) {
+            return;
+        }
+
         if (onAC)
         {
-            // Reset if user is on AC
+            // Reset the "connect" shown state since user is on AC
             g_belowShown = false;
 
             if (percent >= g_unplugThreshold)
             {
-                ShowBalloonTip(
-                    L"Battery Monitor",
-                    L"Battery above threshold. You can unplug now.",
-                    g_notificationSecs * 1000
-                );
+                // Only show if not recurring or not yet shown
+                if (!g_noRecurringAbove || !g_aboveShown)
+                {
+                    std::wstringstream ss;
+                    ss << L"Battery is at " << percent << L"%. "
+                        << L"You can disconnect your charger.";
+                    ShowBalloonTip(
+                        L"BatteryNotifier",
+                        ss.str().c_str(),
+                        g_notificationSecs * 1000
+                    );
+                    g_aboveShown = true;
+                }
+            }
+            else
+            {
+                // If not above threshold, reset the "above" shown state
+                g_aboveShown = false;
             }
         }
         else
         {
-            // On battery
+            // Reset the "disconnect" shown state since user is on battery
+            g_aboveShown = false;
+
             if (percent <= g_plugThreshold)
             {
-                // Only show "below threshold" if not recurring or not shown yet
+                // Only show "connect" if not recurring or not shown yet
                 if (!g_noRecurringBelow || !g_belowShown)
                 {
+                    std::wstringstream ss;
+                    ss << L"Battery is at " << percent << L"%. "
+                        << L"Please connect your charger.";
                     ShowBalloonTip(
-                        L"Battery Monitor",
-                        L"Battery below threshold. Please plug in.",
+                        L"BatteryNotifier",
+                        ss.str().c_str(),
                         g_notificationSecs * 1000
                     );
                     g_belowShown = true;
                 }
+            }
+            else
+            {
+                // If not below threshold, reset the "below" shown state
+                g_belowShown = false;
             }
         }
     }
