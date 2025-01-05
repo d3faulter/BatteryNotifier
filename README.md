@@ -16,7 +16,7 @@ The most lightweight Windows tray application for charging notifications. It not
 
 ## Configuration
 
-Create or edit a `.ini` file named `BatteryNotifier.ini` in the same folder as the `.exe`. **Please restart application after making changes**.\Example:
+Create or edit a `.ini` file named `BatteryNotifier.ini` in the same folder as the `.exe`. **Please restart application after making changes**.\ Example:
 
 ```ini
 [Settings]
