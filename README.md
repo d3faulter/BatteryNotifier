@@ -29,7 +29,7 @@ NotificationTimeout=30
 NotificationIntervalType=time
 NotificationIntervalValue=5
 ```
-**Note:** Please restart application after making changes.  
+**Note:** Please restart application after making changes (right-click tray icon).  
 
 ### Explanation:
 - **UnplugThreshold**: If battery >= this value and you’re on AC, you’ll see an "unplug" balloon.
