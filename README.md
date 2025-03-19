@@ -3,7 +3,8 @@
 The most lightweight Windows tray application for charging notifications. It notifies you when your laptop battery reaches user-defined thresholds for connecting or disconnecting the charger to prolong battery life. Uses **under 1 MB of RAM** in most cases!
 
 ![image](https://github.com/user-attachments/assets/ba511a98-06e0-4d29-bdad-51c21d8e5a04)
-![image](https://github.com/user-attachments/assets/fbdbb8b8-6161-460f-a077-b8935b2a0a0f)
+![image](https://github.com/user-attachments/assets/260ce7bb-e010-438d-a29d-8e2d7e63de3a)
+
 
 
 ## Features
