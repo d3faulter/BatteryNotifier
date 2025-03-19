@@ -70,3 +70,6 @@ Either download the compiled x64 version from releases or follow the steps below
 - Notifications may not always appear in the Notification Center or Action Center due to how Windows handles legacy balloon notifications.
 - For truly persistent notifications requiring user dismissal, you would need modern Windows Toast notifications (more resource heavy).
 
+## Notes
+
+- **Check for duplicate processes on start**: Currently multiple processes will start when opening the app with existing process running (can currently be closed manually by right-clicking tray icon or task manager)
