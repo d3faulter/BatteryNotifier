@@ -7,8 +7,6 @@ The most lightweight Windows tray application for charging notifications. It not
 ![image](https://github.com/user-attachments/assets/ba511a98-06e0-4d29-bdad-51c21d8e5a04)
 ![image](https://github.com/user-attachments/assets/260ce7bb-e010-438d-a29d-8e2d7e63de3a)
 
-
-
 ## Features
 
 - **Tiny footprint**: Written in C++ with raw Win32 APIs, typically under **1 MB** memory use.
@@ -21,9 +19,7 @@ The most lightweight Windows tray application for charging notifications. It not
 
 ## Configuration
 
-Create or edit a `.ini` file named `BatteryNotifier.ini` in the same folder as the `.exe`. Example:  
-
-
+Configuration can be made through the included `.ini` configuration file. Make sure it is in the same folder as the `.exe`. Example setttings:  
 
 ```ini
 [Settings]
@@ -36,7 +32,7 @@ NotificationIntervalValue=5
 ```
 **Note:** Please restart application after making changes (right-click tray icon).  
 
-### Explanation:
+### Explanation of values:
 - **UnplugThreshold**: If battery >= this value and you’re on AC, you’ll see an "unplug" balloon.
 - **PlugThreshold**: If battery <= this value and you’re on battery, you’ll see a "plug in" balloon.
 - **NoRecurringBelow**: `true` or `false`. If `true`, only one "below threshold" balloon until you plug in again.
@@ -72,9 +68,9 @@ Either download the compiled x64 version from releases or follow the steps below
 
 - Windows 10/11 might show balloon tips briefly or in the Action Center, ignoring long timeouts.
 - Notifications may not always appear in the Notification Center or Action Center due to how Windows handles legacy balloon notifications.
-- For truly persistent notifications requiring user dismissal, you would need modern Windows Toast notifications (more resource heavy).
+- For truly persistent notifications requiring user dismissal, you would need modern Windows Toast notifications (outside scope of this project as it uses more resources).
 
-## To-Do
+## Future Changes
 
 - **Check for duplicate processes on start**: Currently multiple processes will start when opening the app with an existing process running (can be closed manually by right-clicking tray icon or task manager). If i have time i might add a check for this.
 - **Change tray icon and Baloon text/icon**: Notification text and icons could do with a makeover. Will look at this when i get the time.
