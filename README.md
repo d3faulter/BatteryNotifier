@@ -52,8 +52,10 @@ Either download the compiled x64 version from releases or follow the steps below
 
 1. Compile the application in Visual Studio (with the "Desktop development with C++" workload) or using the MSVC command line.
 2. Place `BatteryNotifier.exe` and `BatteryNotifier.ini` in the same folder.
-3. Run the `.exe`. A tray icon will appear (hover text: "BatteryNotifier").
-4. Right-click the tray icon and select "Exit" to quit the application.
+4. Run the `.exe`. A tray icon will appear (hover text: "BatteryNotifier").
+5. That's it. Right-click the tray icon and select "Exit" to quit the application.
+
+**Applying config changes**: To apply changes in the config, just restart the app.
 
 ## Improvements in the Latest Version
 
