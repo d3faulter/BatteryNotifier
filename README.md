@@ -76,4 +76,5 @@ Either download the compiled x64 version from releases or follow the steps below
 
 ## To-Do
 
-- **Check for duplicate processes on start**: Currently multiple processes will start when opening the app with existing process running (can currently be closed manually by right-clicking tray icon or task manager)
+- **Check for duplicate processes on start**: Currently multiple processes will start when opening the app with an existing process running (can be closed manually by right-clicking tray icon or task manager). If i have time i might add a check for this.
+- **Change tray icon and Baloon text/icon**: Notification text and icons could do with a makeover. Will look at this when i get the time.
