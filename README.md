@@ -2,6 +2,8 @@
 
 The most lightweight Windows tray application for charging notifications. It notifies you when your laptop battery reaches user-defined thresholds for connecting or disconnecting the charger to prolong battery life. Uses **under 1 MB of RAM** in most cases!
 
+**Purpose**: Even though many laptops have built in support for charge limiting, many modern laptops (e.g. non-business HP laptops) lack the hardware support for this. The only way to circumvent it is by manually stopping the charging, which is often difficult to remember. Thus, a tiny reminder app can do it for you. 
+
 ![image](https://github.com/user-attachments/assets/ba511a98-06e0-4d29-bdad-51c21d8e5a04)
 ![image](https://github.com/user-attachments/assets/260ce7bb-e010-438d-a29d-8e2d7e63de3a)
 
